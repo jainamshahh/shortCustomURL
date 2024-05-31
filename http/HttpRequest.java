@@ -11,9 +11,10 @@ public class HttpRequest{
 
 	private String httpMethod;
 	private String requestTarget;
+	private Hashtable<String, String> queryParameters;
 	private String httpVersion;
 	private Hashtable<String, String> requestHeaders;
-    private StringBuffer messageBody;
+	private StringBuffer messageBody;
 
 	public HttpRequest() {
         	//requestHeaders = new Hashtable<String, String>();
@@ -28,6 +29,10 @@ public class HttpRequest{
 		return(requestTarget);
 	}
 
+	public Hashtable<String, String> getQueryParameters() {
+		return queryParameters;
+	}
+
 	public String getHttpVersion(){
 		return(httpVersion);
 	}
@@ -36,7 +41,7 @@ public class HttpRequest{
 		return(requestHeaders);
 	}
 
-	public StringBuffer getmessageBody(){
+	public StringBuffer getMessageBody(){
 		return(messageBody);
 	}
 
@@ -52,13 +57,17 @@ public class HttpRequest{
 	
 	public void setRequestTarget(String requestTarget) throws HttpParsingException{
 		if (requestTarget == null || requestTarget.length()==0 || requestTarget.charAt(0)!='/') {
-            throw new HttpParsingException(400, "Bad Request");
+			throw new HttpParsingException(400, "Bad Request");
         }
 		else{
 			this.requestTarget = requestTarget;
 		}
 	}
-	
+
+	public void setQueryParameters(Hashtable<String, String> queryParameters) {
+		this.queryParameters = queryParameters;
+	}
+		
 	public void setHttpVersion(String httpVersion) throws HttpParsingException{
 		if(httpVersions.contains(httpVersion)){	
 			this.httpVersion = httpVersion;
@@ -75,5 +84,6 @@ public class HttpRequest{
 	public void setMessageBody(StringBuffer messageBody){
 		this.messageBody = messageBody;
 	}	
+
 
 }

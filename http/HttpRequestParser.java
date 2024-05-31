@@ -20,7 +20,7 @@ class HttpRequestParser{
 
 		parseRequestHeaders(reader, request);
 
-        parseRequestBody(reader, request);
+		parseRequestBody(reader, request);
 
 		return(request);
 		
@@ -57,7 +57,8 @@ class HttpRequestParser{
 					methodParsed = true;
 				}
 				else if(!requestTargetParsed){
-					request.setRequestTarget(dataBuffer.toString());
+					//request.setRequestTarget(dataBuffer.toString());
+					parseRequestTarget(dataBuffer.toString(),request);
 					requestTargetParsed = true;
 				}
 				else{
@@ -73,6 +74,37 @@ class HttpRequestParser{
 		throw new HttpParsingException(400, "Bad Request");
 		
 
+	}
+
+	private void parseRequestTarget(String requestTarget,HttpRequest request) throws HttpParsingException{
+
+		if (requestTarget.contains("?")) {
+			String[] queryTargetParts = requestTarget.split("\\?");
+			request.setRequestTarget(queryTargetParts[0]);
+			parseQueryParams(queryTargetParts[1],request);
+			
+		} else {
+			request.setRequestTarget(requestTarget);
+		}
+
+
+	}
+
+	private void parseQueryParams(String params, HttpRequest request) throws HttpParsingException {
+
+		Hashtable<String, String> queryParameters = new Hashtable<String,String>();
+		String[] queryParamsPart = params.split("&");
+		for(String param : queryParamsPart ){
+			String[] paramPart = param.split("=");
+			if(paramPart.length==2){
+				queryParameters.put(paramPart[0], paramPart[1]);
+			}
+			else{
+				throw new HttpParsingException(400, "Bad Request");
+			}
+		}
+		request.setQueryParameters(queryParameters);
+	
 	}
 
 	private void parseRequestHeaders(InputStreamReader reader,HttpRequest request) throws IOException,HttpParsingException{
@@ -120,7 +152,7 @@ class HttpRequestParser{
 					}
 				}
 				else{
-					throw new HttpParsingException(400, "Bad Request");
+					dataBuffer.append((char) b);
 				}
 			}
 			else{
