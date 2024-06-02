@@ -1,4 +1,4 @@
-package Model;
+package com.shortCustomURL.model;
 
 public class URL {
     private String shortURL = null;

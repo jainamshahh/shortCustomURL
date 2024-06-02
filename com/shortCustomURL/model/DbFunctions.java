@@ -1,4 +1,4 @@
-package Model;
+package com.shortCustomURL.model;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,10 +12,10 @@ public class DbFunctions {
             Class.forName("org.postgresql.Driver");
             conn= DriverManager.getConnection("jdbc:postgresql://localhost:5432/"+dbname,user,password);
             if(conn!=null){
-                System.out.println("Connection Established");
+                System.out.println("Database Connection Established");
             }
             else{
-                System.out.println("Connection Failed");
+                System.out.println("Database Connection Failed");
             }
 
         }catch (Exception e){
@@ -40,6 +40,7 @@ public class DbFunctions {
         Statement statement;
         ResultSet rs=null;
         String shortURL = url.getShortURL();
+
         try {
             String query=String.format("select \"longURL\" from \"URL_TABLE\" WHERE \"shortURL\" =  '%s\'",shortURL);
             statement=conn.createStatement();
@@ -48,7 +49,33 @@ public class DbFunctions {
                 //no data
             }
             else{
+                rs.next();
                 url.setLongURL(rs.getString("longURL"));
+            } 
+
+        }
+        catch (Exception e){
+
+            e.printStackTrace();
+            throw new DbConnectionException();
+        }
+    }
+
+    public boolean checkURLEntry(Connection conn,URL url ) throws DbConnectionException{
+        Statement statement;
+        ResultSet rs=null;
+        String shortURL = url.getShortURL();
+        try {
+            String query=String.format("select \"longURL\" from \"URL_TABLE\" WHERE \"shortURL\" =  '%s\'",shortURL);
+            statement=conn.createStatement();
+            rs=statement.executeQuery(query);
+            if (!rs.isBeforeFirst() ) {    
+                //no data
+                return(false);
+            }
+            else{
+                
+                return(true);
             } 
 
         }

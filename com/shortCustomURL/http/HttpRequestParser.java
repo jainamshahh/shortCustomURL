@@ -1,10 +1,12 @@
+package com.shortCustomURL.http;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Hashtable;
 
-class HttpRequestParser{
+public class HttpRequestParser{
 	
 	private static final int SP = 32;
     private static final int CR = 13;
@@ -17,11 +19,15 @@ class HttpRequestParser{
 		HttpRequest request = new HttpRequest();
 
 		parseRequestLine(reader,request);
-
 		parseRequestHeaders(reader, request);
 
-		parseRequestBody(reader, request);
-
+		Hashtable<String, String> requestHeaders = request.getRequestHeaders();
+		if(requestHeaders.contains("Content-Length")){
+			int length = Integer.valueOf((requestHeaders.get("Content-Length")));
+			parseRequestBody(reader,request,length);
+		}
+		
+		
 		return(request);
 		
 		
@@ -84,6 +90,7 @@ class HttpRequestParser{
 			parseQueryParams(queryTargetParts[1],request);
 			
 		} else {
+			
 			request.setRequestTarget(requestTarget);
 		}
 
@@ -125,7 +132,7 @@ class HttpRequestParser{
 					}
 					else{
 						if(headerKeyParsed){
-							headerValue = dataBuffer.toString();
+							headerValue = (dataBuffer.toString()).trim();
 							requestHeaders.put(headerKey.toString(), headerValue.toString());
 							dataBuffer.delete(0, dataBuffer.length());
 							headerLineParsed = true;
@@ -169,16 +176,9 @@ class HttpRequestParser{
 
 	}
 
-	private void parseRequestBody(InputStreamReader reader,HttpRequest request) throws IOException{
+	private void parseRequestBody(InputStreamReader reader,HttpRequest request,int length) throws IOException{
 
-		StringBuffer dataBuffer = new StringBuffer();
-
-		int b;
-		while((b=reader.read()) >= 0){
-			dataBuffer.append((char) b);
-		}
-
-		request.setMessageBody(dataBuffer);
+		// will implment in future as not needed currently
 
 	}
 

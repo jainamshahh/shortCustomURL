@@ -1,9 +1,9 @@
-package Model;
+package com.shortCustomURL.model;
 
 public class DbConnectionException extends Exception{
 
     DbConnectionException(){
-        super("Database Error");
+        super("Error in Database");
     }
     
 }

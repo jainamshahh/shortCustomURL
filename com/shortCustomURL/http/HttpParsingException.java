@@ -1,3 +1,5 @@
+package com.shortCustomURL.http;
+
 public class HttpParsingException extends Exception {
     final int errorCode;
     final String errorMessage;

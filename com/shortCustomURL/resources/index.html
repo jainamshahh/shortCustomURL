@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Custom URL Shortener</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            margin-top: -50px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            color: #555;
+        }
+        input, select, button {
+            width: calc(100% - 10px);
+            margin-top: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .url-input {
+            display: flex;
+            align-items: center;
+        }
+        .url-input select {
+            width: 30%;
+            margin-right: 5px;
+        }
+        .url-input input {
+            width: 70%;
+        }
+        .custom-url {
+            display: flex;
+            align-items: center;
+        }
+        .custom-url span {
+            white-space: nowrap;
+        }
+        .custom-url input {
+            flex: 1;
+            margin-left: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result, #error {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            color: #333;
+            max-width: 400px;
+            width: 100%;
+        }
+        #result {
+            background: #e0ffe0;
+            border: 1px solid #b2ffb2;
+        }
+        #error {
+            background: #ffe0e0;
+            border: 1px solid #ffb2b2;
+        }
+    </style>
+</head>
+<body>
+    <form id="urlForm">
+        <h1>Custom URL Shortener</h1>
+        <label for="longURL">Enter URL:</label>
+        <div class="url-input">
+            <select id="protocol" name="protocol" required>
+                <option value="http://">http://</option>
+                <option value="https://">https://</option>
+            </select>
+            <input type="text" id="longURL" name="url" placeholder="Enter URL" required>
+        </div>
+
+        <label for="customText">Custom Short URL:</label>
+        <div class="custom-url">
+            <span>http://localhost/</span>
+            <input type="text" id="customText" name="customText" placeholder="customText" required>
+        </div>
+
+        <button type="submit">Shorten</button>
+    </form>
+
+    <div id="result">
+        <p id="successMessage">Short URL successfully created:</p>
+        <p>Short URL: <a id="shortURL" href="#" target="_blank"></a></p>
+    </div>
+    <div id="error">
+        <p id="errorMessage"></p>
+    </div>
+
+    <script>
+        document.getElementById('urlForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const protocol = document.getElementById('protocol').value;
+            //const longURL = encodeURIComponent(protocol + document.getElementById('longURL').value);
+			const longURL = protocol + document.getElementById('longURL').value;
+            //const customText = encodeURIComponent(document.getElementById('customText').value);
+			const customText = document.getElementById('customText').value;
+            const shortURL = `${customText}`;
+
+            const params = new URLSearchParams({
+                longURL: longURL,
+                shortURL: shortURL
+            });
+
+            fetch(`http://localhost:8080/shorten?${params.toString()}`, {
+                method: 'POST',
+               
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const resultDiv = document.getElementById('result');
+                    const successMessage = document.getElementById('successMessage');
+                    const shortURLLink = document.getElementById('shortURL');
+                    shortURLLink.href = data.shortURL;
+                    shortURLLink.textContent = data.shortURL;
+                    resultDiv.style.display = 'block';
+                    successMessage.textContent = "Short URL successfully created:";
+                    document.getElementById('error').style.display = 'none';
+                } else {
+                    document.getElementById('errorMessage').textContent = data.message;
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('result').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').textContent = 'An error occurred while shortening the URL.';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('result').style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
